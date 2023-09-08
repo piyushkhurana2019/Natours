@@ -5,6 +5,7 @@ const Tour = require('../models/tourModels');
 const { Query } = require('mongoose');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 exports.aliasTopTours = (req, res, next)=>{
     req.query.limit = '5';
@@ -14,9 +15,9 @@ exports.aliasTopTours = (req, res, next)=>{
 }
 
 
-exports.getAllTours= catchAsync(async (req,res)=>{
+exports.getAllTours= catchAsync(async (req,res,next)=>{
 
-    try{
+
 
         //1A) BASIC FILTERING
         // const queryObj = {...req.query};             //{...} is used to show the element as an object structure
@@ -91,18 +92,20 @@ exports.getAllTours= catchAsync(async (req,res)=>{
         tours
        }
     });
-} catch (err) {
-    res.status(404).json({
-        status: 'Fail',
-        message:err
-    });
-}
 });
-exports.getParticularTour = catchAsync(async (req,res)=>{
+exports.getParticularTour = catchAsync(async (req,res, next)=>{
 
     // const id = req.params.id*1;                    //as the id in the param or in the url is in the form of string but we need it as an array that is integer therefore multiply by 1 
-try{
-    const tour = await Tour.findById(req.params.id);
+
+    const tour = await Tour.findById(req.params.id).populate('reviews');
+    // .populate({
+    //     path : 'guides',
+    //     select: '-__v -'});
+    // populate hmesha query m hi hota hai but ye sirf issi query m ho rha tha so iska ek pre query middleware bna diya
+if(!tour){
+    return next(new AppError('No tour found with that id',404))
+}
+
     //Tour.finfdById is just a short hand for typical mongodb syntax of Tour.findOne({_id: req.params.id })
     res.status(200).json({
         status:'Success',
@@ -110,19 +113,11 @@ try{
             tour
         }
     });
-}   catch (err) {
-        res.status(404).json({
-            status:'Fail',
-            message:err
-        })
-    }
-
-   
 });
 
-exports.addNewTour = catchAsync(async (req,res)=>{    // IN post method req contains some data that need to be sent but express doesnt itself have property to hold that requested data or to put that body dataon the request, therefore we require some Middleware  
+exports.addNewTour = catchAsync(async (req,res,next)=>{    // IN post method req contains some data that need to be sent but express doesnt itself have property to hold that requested data or to put that body dataon the request, therefore we require some Middleware  
    
-    try{
+ 
         // const newTour = new Tour({})        
         // newTour.save()
 
@@ -134,21 +129,18 @@ exports.addNewTour = catchAsync(async (req,res)=>{    // IN post method req cont
                 tour: newTour
             }
         });
-    }catch(err) {
-        res.status(400).json({
-            status: "fail",
-            message: err
-        });
-    }
 });
 
-exports.updateTour = catchAsync(async (req,res)=>{ 
+exports.updateTour = catchAsync(async (req,res,next)=>{ 
 
-    try{
+   
         const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
             new: true,              //to return the newly updated document
             runValidators: true     //to run again the validators that we defined in the schema
-        })
+        });
+
+        if(!tour)
+        return next(new AppError('No Tour found with that id'));
 
         res.status(200).json({
             status: "Success",
@@ -158,32 +150,21 @@ exports.updateTour = catchAsync(async (req,res)=>{
             }
     
         })
-    }
-        catch (err) {
-            res.status(400).json({
-                status: 'fail',
-                message: err
-            });
-        }
 });
 
-exports.deleteTour =catchAsync(async (req,res)=>{
-    try{
-    await Tour.findByIdAndDelete(req.params.id); 
+exports.deleteTour =catchAsync(async (req,res, next)=>{
+
+    const tour = await Tour.findByIdAndDelete(req.params.id); 
+    if(!tour){
+        return next(new AppError('No tour found with that id',404));
+    }
     res.status(204).json({
         status: "Success",
         data:null
     })
-} catch (err) {
-    res.status(400).json({
-        status: "fail",
-        message: err
-    });
-}
 });
 
-exports.getTourStats = catchAsync(async (req, res)=>{
-    try{
+exports.getTourStats = catchAsync(async (req, res,next)=>{
         // aggregation pipeline m no. of stages hoti hai jisse sara data paas hota hai so iski help se hum kuch bhi operations on the data lga skte hai like average max min etc.
 
         //aggregate function ek array lete hai jisme processes define hote hai     
@@ -219,13 +200,6 @@ exports.getTourStats = catchAsync(async (req, res)=>{
                 stats
             }
         });          
-
-    }catch(err){
-        res.status(400).json({
-            status: "fail",
-            message: err
-        });
-    }
 });
 
 exports.getMonthlyPlan = catchAsync(async (req, res)=>{

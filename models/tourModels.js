@@ -3,7 +3,7 @@
 const slugify = require('slugify');
 const mongoose = require('mongoose');
 const validator = require('validator');
-const User = require('./userModels'); 
+// const User = require('./userModels'); 
 const { promises } = require('nodemailer/lib/xoauth2');
 //creating mongoose schema
 const tourSchema = new mongoose.Schema({
@@ -121,13 +121,28 @@ const tourSchema = new mongoose.Schema({
 }
 ],
 
-guides:Array
+guides: 
+// Array            // simple Array likhte toh direct reference mil jata that means child referencong ab aise type likhke and reference daalke likh rhe h toh populate krna pdega nhi toh sirf id hi show hoyegi output m
+[
+    {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    }
+],
+
+// reviews:[
+//     {
+//         type: mongoose.Schema.ObjectId,
+//         ref:'Review'
+// }
+// ]         // this is one of the way in which we can get reviews in tours, now we populate this array of reviews id to get reviews
+
+// But a short method of doing this is to use virtual populate.
+
 },
 
-
-
 {
-    toJSON:{ virtuals:true},         //jb jb data json ki form m output hoga tb tb virtuals true ho jayega so that the virtuals will also be the part of output
+    toJSON:{ virtuals:true},         //jb jb data json ki form m output hoga tb tb virtuals true ho jayega so that the virtuals will also be the part of output virtuals mtlb aisi value jo direct db m nhi h but kisi trah se calculate ki gyi hai
     toObject:{ virtuals:true}        //to actually show/see the schema in object format
 });
 
@@ -139,6 +154,15 @@ tourSchema.virtual('durationWeeks').get(function(){      //we use nrml function 
     //IMPORTANT we cannot use queries like Tour.find(where durationWeeks =1) as durationWeeks is not the part of DB 
 })
 
+// VIRTUAL POPULATE
+tourSchema.virtual('reviews',{
+    ref:'Review',
+    foreignField:'tour',// this is the name of the field in the other model, where the reference of the current model is stored in order to connect these 2 model
+    localField:'_id'             // where the id of the current model is stored here in this current tour model 
+
+    //_id is called in the local model is called tour in the foreign model under review model 
+})
+
 //DOCUMENT MIDDLEWARE that runs just before the .save(), .create()   note:- will not run for insertMany document middleware hota hi sirf save cmnd k saath use krne k liye hai
 tourSchema.pre('save', function(next){       //There are 2 types of middleware pre and post pre meanns phle run krega post means baad m      here it is alled a pre save hook, hook is save here  
     // console.log(this)     // wil show the recently saved/created document in the DB
@@ -146,11 +170,11 @@ tourSchema.pre('save', function(next){       //There are 2 types of middleware p
     next();
 });
 
-tourSchema.pre('save', function(next){
-    const guidesPromises = this.guides.map(async id=> await User.findById(id))
-    this.guides = await promise.all(guidesPromises);
-    next()
-})
+// tourSchema.pre('save', async function(next){
+//     const guidesPromises = this.guides.map(async id=> await User.findById(id))
+//     this.guides = await Promise.all(guidesPromises);
+//     next();
+// })
 
 // tourSchema.pre('save',function(next){       //just to show there can be 2 pre middleware at the same time, 
 //     console.log(this);                      // middleware itself gives access to the this keyword that refers to the most recent one                   
@@ -170,6 +194,14 @@ tourSchema.pre(/^find/,function(next){               //un sbhi methods k liy ech
     this.find({secretTour: {$ne: true}});         //simply shows those whose secretTour is false
     this.start = Date.now();                       // ye this. use ho rha hai current querry k liye
     next();
+});
+
+tourSchema.pre(/^find/,function(next){
+    this.populate({
+        path : 'guides',
+        select: '-__v'});
+
+        next();
 });
 
 tourSchema.post(/^find/,function(docs, next){

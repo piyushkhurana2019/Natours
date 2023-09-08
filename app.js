@@ -14,6 +14,7 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 console.log(process.env.NODE_ENV );
 
@@ -223,6 +224,7 @@ app.use((req,res,next)=>{
 
 app.use('/api/v1/users',userRouter)
 app.use('/api/v1/tours',tourRouter)
+app.use('/api/v1/reviews',reviewRouter)
 
 // app.all('*',(req,res,next)=>{                            // this middleware get called after getting any url other than one which is accepted by the above 2   agr upper 2 se phle lga dete toh hmesha yhi chlta
     // res.status(404).json({

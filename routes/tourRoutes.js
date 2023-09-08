@@ -4,6 +4,8 @@ const app = express();
 const router = express.Router();
 const tourController = require('../controllers/tourControllers')
 const authController = require('../controllers/authControllers');
+// const reviewController = require('../controllers/reviewController');
+const reviewRouter = require('../routes/reviewRoutes');
 
 // router.param('id',(req,res,next,val)=>{      // this is a middleware therefore next variable and value of id i.e. the only param at this point is stored in val
 //     console.log(`tour id is ${val}`);
@@ -11,6 +13,9 @@ const authController = require('../controllers/authControllers');
 // })
 
 // router.param('id');  //this will remove repeated lines of code that we need to check on delete, patch,get user
+
+
+router.use('/:tourId/reviews', reviewRouter)
 
 router
 .route('/top-5-cheap')
@@ -34,5 +39,7 @@ router
 .get(tourController.getParticularTour)
 .patch(tourController.updateTour)
 .delete(authController.protect, authController.restrictTo('admin','lead-guide'), tourController.deleteTour);
+
+// router.route('/:tourId/reviews').post(authController.protect, authController.restrictTo('user'), reviewController.createReview);
 
 module.exports = router;
