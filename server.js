@@ -11,8 +11,6 @@ process.on('uncaughtException', err => {
 dotenv.config({ path: './config.env'});
 const app = require('./app'); // ye niche hi rhega as agr upar rha toh environment variable config hone se phle hi app define ho jayegi and then env variable ko hum udhr console m log nhi kr payenge
 
-
-
 const DB = process.env.DATABASE.replace('<PASSWORD>',process.env.DATABASE_PASSWORD);
 
 mongoose

@@ -1,11 +1,12 @@
 //THIN CONTROLLERS    As low business logic as can be possible as it is linked to nrml user
 
-const { query } = require('express');
+// const { query } = require('express');
 const Tour = require('../models/tourModels');
-const { Query } = require('mongoose');
-const APIFeatures = require('../utils/apiFeatures');
+// const { Query } = require('mongoose');
+// const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+// const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 exports.aliasTopTours = (req, res, next)=>{
     req.query.limit = '5';
@@ -15,154 +16,164 @@ exports.aliasTopTours = (req, res, next)=>{
 }
 
 
-exports.getAllTours= catchAsync(async (req,res,next)=>{
+// exports.getAllTours= catchAsync(async (req,res,next)=>{
 
 
 
-        //1A) BASIC FILTERING
-        // const queryObj = {...req.query};             //{...} is used to show the element as an object structure
-        // const excludeFields = ['page','sort','limit','fields'];   
-        // excludeFields.forEach(el=> delete queryObj[el]);     //to exclude the extra filters given by user that are not defined yet
+//         //1A) BASIC FILTERING
+//         // const queryObj = {...req.query};             //{...} is used to show the element as an object structure
+//         // const excludeFields = ['page','sort','limit','fields'];   
+//         // excludeFields.forEach(el=> delete queryObj[el]);     //to exclude the extra filters given by user that are not defined yet
 
-        // // console.log(req.query, queryObj);
+//         // // console.log(req.query, queryObj);
 
 
-        // //1B) ADVANCE FILTERING
-        // let queryStr = JSON.stringify(queryObj);
-        // queryStr= queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match =>`$${match}`);  //hmne console m normally print krwa k dekha toh ota chla ki baaki string same hai bss fron m $ ki kami hai so we replaced
-        // // console.log(JSON.parse(queryStr));
+//         // //1B) ADVANCE FILTERING
+//         // let queryStr = JSON.stringify(queryObj);
+//         // queryStr= queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match =>`$${match}`);  //hmne console m normally print krwa k dekha toh ota chla ki baaki string same hai bss fron m $ ki kami hai so we replaced
+//         // // console.log(JSON.parse(queryStr));
         
-        // //BUILD QUERY
-        // let Query = Tour.find(JSON.parse(queryStr));
+//         // //BUILD QUERY
+//         // let Query = Tour.find(JSON.parse(queryStr));
 
-        // 2)Sorting
+//         // 2)Sorting
 
-        // if(req.query.sort){
-        //     // Query = Query.sort(req.query.sort);  // here we can only sort by one item let say just by price or just by ratings but what if we need to sort 1st about price then about ratings
+//         // if(req.query.sort){
+//         //     // Query = Query.sort(req.query.sort);  // here we can only sort by one item let say just by price or just by ratings but what if we need to sort 1st about price then about ratings
 
-        //     // we need to add , in the url after writing sort=price,ratings
-        //     // then we need to replace that comma by a space so that it can be read by our sorting code
+//         //     // we need to add , in the url after writing sort=price,ratings
+//         //     // then we need to replace that comma by a space so that it can be read by our sorting code
 
-        //     const sortBy = req.query.sort.split(',').join(' ');
-        //     // console.log(sortBy);
-        //     Query = Query.sort(sortBy);
-        // }
-        // else{
-        //     Query = Query.sort('-createdAt')
-        // }
+//         //     const sortBy = req.query.sort.split(',').join(' ');
+//         //     // console.log(sortBy);
+//         //     Query = Query.sort(sortBy);
+//         // }
+//         // else{
+//         //     Query = Query.sort('-createdAt')
+//         // }
 
-        // 3) Fields Limiting
+//         // 3) Fields Limiting
 
-        // if(req.query.fields){
-        //     const fields = req.query.fields.split(',').join(' ');
-        //     Query = Query.select(fields);
-        // }
-        // else{
-        //     Query = Query.select('-__v');          // -__v to select all except __v as it is created by mongoose to use it internally and it is of no use to the user
-        // }
+//         // if(req.query.fields){
+//         //     const fields = req.query.fields.split(',').join(' ');
+//         //     Query = Query.select(fields);
+//         // }
+//         // else{
+//         //     Query = Query.select('-__v');          // -__v to select all except __v as it is created by mongoose to use it internally and it is of no use to the user
+//         // }
 
-        // 4) Paging
+//         // 4) Paging
 
-        // const Page = req.query.page*1 || 1;  // query m jo page likha jayega vo string m likha jaa rha h toh string hi hoga toh usse convert kiya *1 se int || means by default page 1 rhega if not specified
+//         // const Page = req.query.page*1 || 1;  // query m jo page likha jayega vo string m likha jaa rha h toh string hi hoga toh usse convert kiya *1 se int || means by default page 1 rhega if not specified
 
-        // const Limit = req.query.limit*1 || 100;
-        // const Skip = (Page-1)*Limit;
-        // Query = Query.skip(Skip).limit(Limit); 
-        // // limit means ek page p kitne honge and skip means jonse page p jana chaho vaha tk jane k liye kitne skip krne pdenge ki if page 3 p jana ho toh skip(20) if limit is 10.
+//         // const Limit = req.query.limit*1 || 100;
+//         // const Skip = (Page-1)*Limit;
+//         // Query = Query.skip(Skip).limit(Limit); 
+//         // // limit means ek page p kitne honge and skip means jonse page p jana chaho vaha tk jane k liye kitne skip krne pdenge ki if page 3 p jana ho toh skip(20) if limit is 10.
 
-        // if(req.query.page){
-        //     const numTours = await Tour.countDocuments()   //count the no. of documents i.e results i.e. 9 till here or no. of tours
-        //     if(Skip>=numTours) throw new Error('This page is not found');
-        // }
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        //EXECUTE QUERY (we await it here as there are lot of filtering we need to do above like sort, page etc.etc. if we await it there it takes time to complete annd blocks our code there)
-
-        const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
-        const tours = await features.Query; 
+//         // if(req.query.page){
+//         //     const numTours = await Tour.countDocuments()   //count the no. of documents i.e results i.e. 9 till here or no. of tours
+//         //     if(Skip>=numTours) throw new Error('This page is not found');
+//         // }
 
 
-    //SEND RESPONSE
-    res.status(200).json({
-       status: 'success',
-       results: tours.length,
-       data: {
-        tours
-       }
-    });
-});
-exports.getParticularTour = catchAsync(async (req,res, next)=>{
+// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // const id = req.params.id*1;                    //as the id in the param or in the url is in the form of string but we need it as an array that is integer therefore multiply by 1 
+//         //EXECUTE QUERY (we await it here as there are lot of filtering we need to do above like sort, page etc.etc. if we await it there it takes time to complete annd blocks our code there)
 
-    const tour = await Tour.findById(req.params.id).populate('reviews');
-    // .populate({
-    //     path : 'guides',
-    //     select: '-__v -'});
-    // populate hmesha query m hi hota hai but ye sirf issi query m ho rha tha so iska ek pre query middleware bna diya
-if(!tour){
-    return next(new AppError('No tour found with that id',404))
-}
+//         const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
+//         const tours = await features.Query; 
 
-    //Tour.finfdById is just a short hand for typical mongodb syntax of Tour.findOne({_id: req.params.id })
-    res.status(200).json({
-        status:'Success',
-        data:{
-            tour
-        }
-    });
-});
 
-exports.addNewTour = catchAsync(async (req,res,next)=>{    // IN post method req contains some data that need to be sent but express doesnt itself have property to hold that requested data or to put that body dataon the request, therefore we require some Middleware  
+//     //SEND RESPONSE
+//     res.status(200).json({
+//        status: 'success',
+//        results: tours.length,
+//        data: {
+//         tours
+//        }
+//     });
+// });
+exports.getAllTours= factory.getAll(Tour);
+
+// exports.getParticularTour = catchAsync(async (req,res, next)=>{
+
+//     // const id = req.params.id*1;                    //as the id in the param or in the url is in the form of string but we need it as an array that is integer therefore multiply by 1 
+
+//     const tour = await Tour.findById(req.params.id).populate('reviews');
+//     // .populate({
+//     //     path : 'guides',
+//     //     select: '-__v -'});
+//     // populate hmesha query m hi hota hai but ye sirf issi query m ho rha tha so iska ek pre query middleware bna diya
+// if(!tour){
+//     return next(new AppError('No tour found with that id',404))
+// }
+
+//     //Tour.finfdById is just a short hand for typical mongodb syntax of Tour.findOne({_id: req.params.id })
+//     res.status(200).json({
+//         status:'Success',
+//         data:{
+//             tour
+//         }
+//     });
+// });
+exports.getParticularTour = factory.getOne(Tour, {path: 'reviews'});
+
+// exports.addNewTour = catchAsync(async (req,res,next)=>{    // IN post method req contains some data that need to be sent but express doesnt itself have property to hold that requested data or to put that body dataon the request, therefore we require some Middleware  
    
  
-        // const newTour = new Tour({})        
-        // newTour.save()
+//         // const newTour = new Tour({})        
+//         // newTour.save()
 
-        const newTour = await Tour.create(req.body);
+//         const newTour = await Tour.create(req.body);
     
-        res.status(201).json({
-            status: "Success",
-            data:{
-                tour: newTour
-            }
-        });
-});
+//         res.status(201).json({
+//             status: "Success",
+//             data:{
+//                 tour: newTour
+//             }
+//         });
+// });
+exports.createTour = factory.createOne(Tour);
 
-exports.updateTour = catchAsync(async (req,res,next)=>{ 
+
+
+// exports.updateTour = catchAsync(async (req,res,next)=>{ 
 
    
-        const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,              //to return the newly updated document
-            runValidators: true     //to run again the validators that we defined in the schema
-        });
+//         const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+//             new: true,              //to return the newly updated document
+//             runValidators: true     //to run again the validators that we defined in the schema
+//         });
 
-        if(!tour)
-        return next(new AppError('No Tour found with that id'));
+//         if(!tour)
+//         return next(new AppError('No Tour found with that id'));
 
-        res.status(200).json({
-            status: "Success",
-            message:"Updated successfully",
-            data:{
-                tour
-            }
+//         res.status(200).json({
+//             status: "Success",
+//             message:"Updated successfully",
+//             data:{
+//                 tour
+//             }
     
-        })
-});
+//         })
+// });
+exports.updateTour = factory.updateOne(Tour);
 
-exports.deleteTour =catchAsync(async (req,res, next)=>{
 
-    const tour = await Tour.findByIdAndDelete(req.params.id); 
-    if(!tour){
-        return next(new AppError('No tour found with that id',404));
-    }
-    res.status(204).json({
-        status: "Success",
-        data:null
-    })
-});
+// exports.deleteTour =catchAsync(async (req,res, next)=>{
+
+//     const tour = await Tour.findByIdAndDelete(req.params.id); 
+//     if(!tour){
+//         return next(new AppError('No tour found with that id',404));
+//     }
+//     res.status(204).json({
+//         status: "Success",
+//         data:null
+//     })
+// });
+
+exports.deleteTour = factory.deleteOne(Tour);
 
 exports.getTourStats = catchAsync(async (req, res,next)=>{
         // aggregation pipeline m no. of stages hoti hai jisse sara data paas hota hai so iski help se hum kuch bhi operations on the data lga skte hai like average max min etc.
