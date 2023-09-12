@@ -28,7 +28,8 @@ const tourSchema = new mongoose.Schema({
         type: Number,
         default: 4.5,
         min:[0,'ratings must be more than 0'],          //can also work with dates
-        max:[5,'ratings can be max 5']                  //can also work with dates
+        max:[5,'ratings can be max 5'],                  //can also work with dates
+        set: val=> Math.round(val*10)/10    // as .round no. ko integer m round of krta h, so these calculations are necessary
     },
     ratingsQuantity:{
         type: Number,
