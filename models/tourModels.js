@@ -146,6 +146,12 @@ guides:
     toObject:{ virtuals:true}        //to actually show/see the schema in object format
 });
 
+
+//Setting ids to make searching fo a particular filter easy for mongo as isko saare items search nhi krne pdenge direct ussi index p jaake fetch krlega, one imp thing:- how to decide that which field should get indexed or not:- which is most likely to be searched by the user and which will be least written(update) in future  or agr ek field p phle code m index daal diya and then vo code comment krdiya ya htaa diya toh index abhi bhi db m lga hi hoga vaha se spl jaake htana pdgea
+tourSchema.index({price: 1, ratingsAverage:-1});  // simply 1 for ascending and -1 for descending
+tourSchema.index({slug: 1});  
+
+
 //creating virtual object means something jisko hm alag se DB m store nhi krna chahte like kilometers and meters as they can be derived from on another
 
 tourSchema.virtual('durationWeeks').get(function(){      //we use nrml function here and not the arrow as we are require to use this. here which is not suppported by arrow fun

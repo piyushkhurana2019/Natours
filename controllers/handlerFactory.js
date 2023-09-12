@@ -78,6 +78,7 @@ exports.getAll = Model => catchAsync(async (req,res,next)=>{
 
     const features = new APIFeatures(Model.find(filter), req.query).filter().sort().limitFields().paginate();
     //find () m filter bhi sirf nested get review on tour ko enable krne k liye lgaya h vrna sirf getAlltour k liye nrml find() hi kaafi tha
+    // const doc = await features.Query.explain();    just to see the execution stats
     const doc = await features.Query; 
 
 res.status(200).json({
