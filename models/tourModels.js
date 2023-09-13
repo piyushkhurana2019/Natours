@@ -150,7 +150,8 @@ guides:
 
 //Setting ids to make searching fo a particular filter easy for mongo as isko saare items search nhi krne pdenge direct ussi index p jaake fetch krlega, one imp thing:- how to decide that which field should get indexed or not:- which is most likely to be searched by the user and which will be least written(update) in future  or agr ek field p phle code m index daal diya and then vo code comment krdiya ya htaa diya toh index abhi bhi db m lga hi hoga vaha se spl jaake htana pdgea
 tourSchema.index({price: 1, ratingsAverage:-1});  // simply 1 for ascending and -1 for descending
-tourSchema.index({slug: 1});  
+tourSchema.index({slug: 1}); 
+tourSchema.index({startLocation: '2dsphere'});  // geoSpatial data doesnt have index 1 or -1 it has 2d or 2d sphere, 2d for fictional points on 2d plane and 2dsphere for real points on real objects like earth 
 
 
 //creating virtual object means something jisko hm alag se DB m store nhi krna chahte like kilometers and meters as they can be derived from on another
@@ -220,14 +221,14 @@ tourSchema.post(/^find/,function(docs, next){
 
 //AGGREGATION MIDDLEWARE              jo hum secretTour hide krna chah rhe h vo aggregation m stats nikalte time nhi ho rha therefore ya toh hm hrr aggregation pipeline m jaake secretTour: true valo ko exclude krein ya fr simply sbke liye ek middleware chla le
 
-tourSchema.pre('aggregate',function(next){
+// tourSchema.pre('aggregate',function(next){
 
-    this.pipeline().unshift({ $match: {secretTour: {$ne: true}}});        //unshift aggregation array m 1st p kuch push krna ho toh 
+//     this.pipeline().unshift({ $match: {secretTour: {$ne: true}}});        //unshift aggregation array m 1st p kuch push krna ho toh 
 
-    console.log(this.pipeline());                 // here this. use ho rha hai current aggregate object k liye
-    next();
-})
-
+//     console.log(this.pipeline());                 // here this. use ho rha hai current aggregate object k liye
+//     next();
+// })
+// Commenting the upper one as this is making hurdle in $geoNear as this will be the first while running and its a condition that while using $geoNear, $geoNear should be the first one in the pipeline
 
 
 

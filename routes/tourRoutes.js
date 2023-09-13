@@ -25,6 +25,11 @@ router
 .route('/monthly-plan/:year')
 .get(authController.protect, authController.restrictTo('admin','lead-guide','guide'),tourController.getMonthlyPlan);
 
+router.route('/tours-within/:distance/center/:latlng/unit/:unit').get(tourController.getToursWithin);
+// hum isko :- tours-within?distance=300&center=-40,50&unit=km  bhi likh skte the but upr vala is more cleaner i.e.:- tours-within/300/center/-40,50/unit/km
+
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+
 router
 .route('/tour-stats')
 .get(tourController.getTourStats);

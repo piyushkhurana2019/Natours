@@ -2,6 +2,7 @@
 
 // const { query } = require('express');
 const Tour = require('../models/tourModels');
+const AppError = require('../utils/appError');
 // const { Query } = require('mongoose');
 // const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
@@ -269,3 +270,58 @@ exports.getMonthlyPlan = catchAsync(async (req, res)=>{
         });
     }
 });
+
+exports.getToursWithin = catchAsync(async (req,res,next)=>{
+    const { distance, latlng, unit } = req.params;
+    const [lat, lng] = latlng.split(',');
+    const radius = unit=== 'mi' ? distance/3963.2 : distance/6378.1;   // this conversion bcz mongodb expectg radius to be in radians
+
+    if(!lat || !lng){
+        next(new AppError('please provide latitude and longitude in the format lat, lng.', 400))
+    }
+
+    const tours = await Tour.find({ startLocation: { $geoWithin: { $centerSphere: [ [lng,lat], radius ] }} });
+
+    res.status(200).json({
+        status: 'success',
+        results:tours.length,
+        data:{
+            data: tours
+        }
+    });
+});
+
+exports.getDistances = catchAsync(async (req, res, next)=>{
+    const { latlng, unit } = req.params;
+    const [lat, lng] = latlng.split(',');
+    const multiplier = unit=== 'mi' ? 0.000621371 : 0.001; 
+    if(!lat || !lng){
+        next(new AppError('please provide latitude and longitude in the format lat, lng.', 400))
+    }
+
+   const distances = await Tour.aggregate([
+        {
+            $geoNear:{                               // it will always be the 1st one in the pipeline for geoSpatial space , it requires atleast one or the more stage to contain geospatial index, abhi in our case hmare paas geospatial index m ek hi field hai i.e. startLocation toh ye automatically usse use krlega cal k liye but if multiple hoti toh keys parameter to perform calculatioins
+                near: {
+                    type: 'point',
+                    coordinates: [lng*1, lat*1]
+                },
+                distanceField: 'distance',
+                distanceMultiplier: multiplier     // to convert dist into km as by default it is in meters
+            }                          
+        },
+        {
+            $project:{
+                distance:1,         //to display only selected these 2 fields
+                name:1
+            }
+        }
+    ])
+
+    res.status(200).json({
+        status: 'success',
+        data:{
+            data: distances
+        }
+    });
+})
