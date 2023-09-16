@@ -9,6 +9,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -28,7 +29,17 @@ app.set('views', path.join(__dirname, 'views'));
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 // Set security HTTP headers
-app.use(helmet());
+// app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", 'unpkg.com'],
+      styleSrc: ["'self'", 'cdnjs.cloudflare.com'],
+      // fontSrc: ["'self'", "maxcdn.bootstrapcdn.com"],
+    },
+  }),
+);
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
@@ -46,6 +57,7 @@ app.use('/api', limiter); // jo bhi querry /api se start ho rhi h uspe ye limite
 // Body Parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' })); // Middleware which we talked about
 //limit 10kb means body m jp bhi data aayega vo 10 kb se jyada ka ni ho skta
+app.use(cookieParser());
 
 // Data Sanitization against NoSQL querry injection
 app.use(mongoSanitize()); // filter out all $ and . signs from query etc.
@@ -75,6 +87,8 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
+  console.log(req.cookies);
+  console.log('iske baad');
   next();
 });
 
@@ -211,8 +225,6 @@ app.use((req, res, next) => {
 // app.delete('/api/v1/tours/:id',deleteTour)
 
 ////////////////////////   ROUTES   //////////////////////////////////
-
-
 
 // app.route('/api/v1/tours').get(getAllTours).post(addNewTour);
 // app.route('/api/v1/tours/:id').get(getParticularTour).patch(updateTour).delete(deleteTour);
