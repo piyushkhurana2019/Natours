@@ -1,10 +1,11 @@
 import '@babel/polyfill';
 import { displayMap } from './mapbox';
-import { login } from './login';
+import { login, signup } from './login';
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form');
+const signupForm = document.querySelector('#signupBtn');
 
 //VALUES
 
@@ -20,5 +21,17 @@ if (loginForm) {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     login(email, password);
+    signup(email, password);
+  });
+}
+if (signupForm) {
+  signupForm.addEventListener('click', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const name = document.getElementById('name').value;
+    const passwordConfirm = document.getElementById('passwordConfirm').value;
+     
+    signup(name, email, password, passwordConfirm);
   });
 }
