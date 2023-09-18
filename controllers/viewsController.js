@@ -4,7 +4,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
 exports.getOverview = catchAsync(async (req, res, next) => {
-    console.log('title requested')
+    // console.log('title requested')
   // 1) Get tour data from collection
   const tours = await Tour.find();
 
@@ -14,7 +14,7 @@ exports.getOverview = catchAsync(async (req, res, next) => {
     title: 'All Tours',
     tours,
   });
-  console.log('data sent');
+  // console.log('data sent');
 });
 
 
@@ -58,11 +58,11 @@ exports.getSignupForm = (req, res) => {
     });
 };
 
-// exports.getAccount = (req, res) => {
-//   res.status(200).render('account', {
-//     title: 'Your account'
-//   });
-// };
+exports.getAccount = (req, res) => {
+  res.status(200).render('account', {
+    title: 'Your account'
+  });
+};
 
 // exports.updateUserData = catchAsync(async (req, res, next) => {
 //   const updatedUser = await User.findByIdAndUpdate(

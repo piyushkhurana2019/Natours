@@ -32,7 +32,7 @@ export const signup = async (name, email, password, passwordConfirm) => {
         name,
         email,
         password,
-        passwordConfirm
+        passwordConfirm,
       },
     });
 

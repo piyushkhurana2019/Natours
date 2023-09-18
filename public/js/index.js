@@ -4,7 +4,7 @@ import { login, signup } from './login';
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');
-const loginForm = document.querySelector('.form');
+const loginForm = document.querySelector('#login');
 const signupForm = document.querySelector('#signupBtn');
 
 //VALUES
@@ -16,7 +16,7 @@ if (mapBox) {
 }
 
 if (loginForm) {
-  loginForm.addEventListener('submit', (e) => {
+  loginForm.addEventListener('click', (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -31,7 +31,7 @@ if (signupForm) {
     const password = document.getElementById('password').value;
     const name = document.getElementById('name').value;
     const passwordConfirm = document.getElementById('passwordConfirm').value;
-     
+
     signup(name, email, password, passwordConfirm);
   });
 }

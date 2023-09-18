@@ -12254,7 +12254,7 @@ var _mapbox = require("./mapbox");
 var _login = require("./login");
 // DOM ELEMENTS
 var mapBox = document.getElementById('map');
-var loginForm = document.querySelector('.form');
+var loginForm = document.querySelector('#login');
 var signupForm = document.querySelector('#signupBtn');
 
 //VALUES
@@ -12265,7 +12265,7 @@ if (mapBox) {
   (0, _mapbox.displayMap)(locations);
 }
 if (loginForm) {
-  loginForm.addEventListener('submit', function (e) {
+  loginForm.addEventListener('click', function (e) {
     e.preventDefault();
     var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
