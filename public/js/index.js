@@ -1,11 +1,13 @@
 import '@babel/polyfill';
 import { displayMap } from './mapbox';
 import { login, signup } from './login';
+import { bookTour } from './stripe';
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('#login');
 const signupForm = document.querySelector('#signupBtn');
+const bookBtn = document.getElementById('book-tour');
 
 //VALUES
 
@@ -35,3 +37,10 @@ if (signupForm) {
     signup(name, email, password, passwordConfirm);
   });
 }
+
+if (bookBtn)
+  bookBtn.addEventListener('click', (e) => {
+    e.target.textContent = 'Processing...';
+    const { tourId } = e.target.dataset; //this simply means const tourId = e.target.dataset.tour-id which is in tour.pug this is bcz of JS ES6 syntax which converts tour-id to tourId i.e. in camel case
+    bookTour(tourId);
+  });
