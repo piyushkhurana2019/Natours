@@ -12,6 +12,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -22,7 +23,7 @@ const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
 
-console.log(process.env.NODE_ENV);
+// console.log(process.env.NODE_ENV);
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
@@ -116,6 +117,9 @@ app.use('/api', limiter); // jo bhi querry /api se start ho rhi h uspe ye limite
 // Body Parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' })); // Middleware which we talked about
 //limit 10kb means body m jp bhi data aayega vo 10 kb se jyada ka ni ho skta
+
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));  // to get the data from url while updateing user settings
+
 app.use(cookieParser());
 
 // Data Sanitization against NoSQL querry injection
@@ -137,6 +141,8 @@ app.use(
     ],
   }),
 ); // hpp:- http parameter pollution it prevents our querry by duplicate values for eg. getAllTours with sort=time&sort=price it will give error as sort is only defined for one value there hpp prevents it by converting 2 sorts to 1 but we might want some other things like duration difficulty, etc to have multiple values therefore writing them to whitelist
+
+app.use(compression())  // this here return a moddleware function which then compresses the text or json that will be send to the client(not for images bcz they are already compressed like jpeg format)
 
 app.use((req, res, next) => {
   console.log('Hello from the MiddleWare Side');

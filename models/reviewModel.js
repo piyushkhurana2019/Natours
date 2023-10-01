@@ -65,7 +65,7 @@ reviewSchema.statics.calcAverageRating = async function (tourId) {
       },
     },
   ]);
-  console.log(stats);
+  // console.log(stats);
 
   if (stats.length > 0) {
     await Tour.findByIdAndUpdate(tourId, {
@@ -92,7 +92,7 @@ reviewSchema.pre(/^findOneAnd/, async function (next) {
   // one prblm:- that abhi data save hone se phle ka time h toh idhr hm calcAvgRating nhi call kr skte but for that hum pre ko post m convert kr skte h but if aisa kiya toh hmare paas fr querry ka access nhi reh payega so ek dusra post middleware bnao
   // const r = await this.findOne();    // const nhi use kiya bcz we need to pass this r's value to the next middleware
   this.r = await this.findOne(); // this,r krne p hum ek middleware se dusre p bhej skte h
-  console.log(this.r);
+  // console.log(this.r);
   next();
 });
 

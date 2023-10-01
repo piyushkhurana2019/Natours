@@ -212,12 +212,12 @@ tourSchema.pre(/^find/,function(next){
         next();
 });
 
-tourSchema.post(/^find/,function(docs, next){
+// tourSchema.post(/^find/,function(docs, next){
 
-    console.log(`Query took ${Date.now() - this.start} milliseconds`);     //just to find the time lapse between the doc bnne k phle vala time and kitne der m bn k complete hua vala time
-    // console.log(docs);
-    next();
-})
+//     console.log(`Query took ${Date.now() - this.start} milliseconds`);     //just to find the time lapse between the doc bnne k phle vala time and kitne der m bn k complete hua vala time
+//     // console.log(docs);
+//     next();
+// })
 
 //AGGREGATION MIDDLEWARE              jo hum secretTour hide krna chah rhe h vo aggregation m stats nikalte time nhi ho rha therefore ya toh hm hrr aggregation pipeline m jaake secretTour: true valo ko exclude krein ya fr simply sbke liye ek middleware chla le
 

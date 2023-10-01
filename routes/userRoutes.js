@@ -1,10 +1,12 @@
 const express = require('express');
-const app = express();
+// const app = express();
+const multer = require('multer');
 
 const router = express.Router();
 const userController = require('../controllers/userControllers');
 const authController = require('../controllers/authControllers');
 
+const upload = multer({ dest: 'public/img/users' })
 
 router.post('/signup',authController.signup);
 router.post('/login',authController.login);
@@ -16,7 +18,7 @@ router.use(authController.protect); // This statement will automatically get run
 
 
 router.get('/me',userController.getMe, userController.getParticularUser);
-router.patch('/updateMe', userController.updateMe)
+router.patch('/updateMe', upload.single('photo'), userController.updateMe)
 router.delete('/deleteMe', userController.deleteMe)
 
 
