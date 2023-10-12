@@ -25,6 +25,8 @@ const viewRouter = require('./routes/viewRoutes');
 
 // console.log(process.env.NODE_ENV);
 
+app.use(cookieParser());
+
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -120,7 +122,7 @@ app.use(express.json({ limit: '10kb' })); // Middleware which we talked about
 
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));  // to get the data from url while updateing user settings
 
-app.use(cookieParser());
+
 
 // Data Sanitization against NoSQL querry injection
 app.use(mongoSanitize()); // filter out all $ and . signs from query etc.

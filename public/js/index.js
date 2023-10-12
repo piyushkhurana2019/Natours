@@ -2,7 +2,7 @@ import '@babel/polyfill';
 import { displayMap } from './mapbox';
 import { login, signup } from './login';
 import { bookTour } from './stripe';
-import { updateData } from './updateSettings';
+import { updateSettings } from './updateSettings';
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');
@@ -39,15 +39,18 @@ if (signupForm) {
     signup(name, email, password, passwordConfirm);
   });
 }
-if (userDataForm) {
-  signupForm.addEventListener('submit', (e) => {
+if (userDataForm)
+  userDataForm.addEventListener('submit', e => {
     e.preventDefault();
-    const email = document.getElementById('email').value;
-    const name = document.getElementById('name').value;
+    const form = new FormData();
+    form.append('name', document.getElementById('name').value);
+    form.append('email', document.getElementById('email').value);
+    form.append('photo', document.getElementById('photo').files[0]);
+    console.log(form);
 
-    updateData(name, email);
+    updateSettings(form, 'data');
   });
-}
+
 
 if (bookBtn)
   bookBtn.addEventListener('click', (e) => {
