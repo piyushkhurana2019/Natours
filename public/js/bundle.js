@@ -12072,7 +12072,7 @@ var signup = exports.signup = /*#__PURE__*/function () {
             (0, _alert.showAlert)('success', 'SignUp Successfully');
             window.setTimeout(function () {
               location.assign('/');
-            }, 1000);
+            }, 1);
           }
           _context2.next = 10;
           break;
@@ -12361,7 +12361,7 @@ var _updateSettings = require("./updateSettings");
 var mapBox = document.getElementById('map');
 var loginForm = document.querySelector('.form--login');
 var logOutBtn = document.querySelector('.nav__el--logout');
-var signupForm = document.querySelector('#signupBtn');
+var signupForm = document.querySelector('.signup-form');
 var bookBtn = document.getElementById('book-tour');
 var userDataForm = document.querySelector('.form-user-data');
 
@@ -12372,19 +12372,16 @@ if (mapBox) {
   var locations = JSON.parse(mapBox.dataset.locations);
   (0, _mapbox.displayMap)(locations);
 }
-if (loginForm) {
-  loginForm.addEventListener('click', function (e) {
-    e.preventDefault();
-    var email = document.getElementById('email').value;
-    var password = document.getElementById('password').value;
-    (0, _login.login)(email, password);
-    (0, _login.signup)(email, password);
-  });
-}
+if (loginForm) loginForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+  var email = document.getElementById('email').value;
+  var password = document.getElementById('password').value;
+  (0, _login.login)(email, password);
+});
 if (logOutBtn) logOutBtn.addEventListener('click', _login.logout);
 if (signupForm) {
-  signupForm.addEventListener('click', function (e) {
-    e.preventDefault();
+  signupForm.addEventListener('submit', function (ele) {
+    ele.preventDefault();
     var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
     var name = document.getElementById('name').value;

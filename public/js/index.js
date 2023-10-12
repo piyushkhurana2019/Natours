@@ -8,7 +8,7 @@ import { updateSettings } from './updateSettings';
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
-const signupForm = document.querySelector('#signupBtn');
+const signupForm = document.querySelector('.signup-form');
 const bookBtn = document.getElementById('book-tour');
 const userDataForm = document.querySelector('.form-user-data');
 
@@ -20,21 +20,19 @@ if (mapBox) {
   displayMap(locations);
 }
 
-if (loginForm) {
-  loginForm.addEventListener('click', (e) => {
+if (loginForm)
+  loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     login(email, password);
-    signup(email, password);
   });
-}
 
 if (logOutBtn) logOutBtn.addEventListener('click', logout);
 
 if (signupForm) {
-  signupForm.addEventListener('click', (e) => {
-    e.preventDefault();
+  signupForm.addEventListener('submit', (ele) => {
+    ele.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const name = document.getElementById('name').value;
