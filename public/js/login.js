@@ -46,3 +46,16 @@ export const signup = async (name, email, password, passwordConfirm) => {
     showAlert('error', err.response.data.message);
   }
 };
+
+export const logout = async () => {
+  try {
+    const res = await axios({
+      method: 'GET',
+      url: '/api/v1/users/logout'
+    });
+    if ((res.data.status = 'success')) location.reload(true);  //this step is require bcz setting this as true forces to reload from server side as there may be reload from cache
+  } catch (err) {
+    console.log(err.response);
+    showAlert('error', 'Error logging out! Try again.');
+  }
+};

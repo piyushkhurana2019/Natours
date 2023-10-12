@@ -21,10 +21,10 @@ const createSendToken = (user, statusCode, res) => {
     ),
 
     // Secure: true,    // cookie only travel through encrypted path i.e https
-    httpOnly: true, // Browser can only send, recieve and store cookie not modify it
+    httpOnly: true, // It is more secure way therefore we are using http only Browser can only send, recieve and store cookie not modify it, therefor we cannot delete cookie for logging out user, so what we do is to create a new cookie having the same name but without token and then make any request it doesn't get cookie and hence it automatically logs out
   };
 
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;  //to secure our sensitive data
 
   res.cookie('jwt', token, cookieOptions);
 
@@ -72,6 +72,14 @@ exports.login = catchAsync(async (req, res, next) => {
   //if everything ok, send token to the client
   createSendToken(user, 200, res);
 });
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({ status: 'success' });
+};
 
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) getting Token and check if its there ot not

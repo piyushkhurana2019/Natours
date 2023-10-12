@@ -12000,7 +12000,7 @@ var showAlert = exports.showAlert = function showAlert(type, msg) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.signup = exports.login = void 0;
+exports.signup = exports.logout = exports.login = void 0;
 var _axios = _interopRequireDefault(require("axios"));
 var _alert = require("./alert");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -12088,6 +12088,38 @@ var signup = exports.signup = /*#__PURE__*/function () {
   }));
   return function signup(_x3, _x4, _x5, _x6) {
     return _ref2.apply(this, arguments);
+  };
+}();
+var logout = exports.logout = /*#__PURE__*/function () {
+  var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+    var res;
+    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      while (1) switch (_context3.prev = _context3.next) {
+        case 0:
+          _context3.prev = 0;
+          _context3.next = 3;
+          return (0, _axios.default)({
+            method: 'GET',
+            url: '/api/v1/users/logout'
+          });
+        case 3:
+          res = _context3.sent;
+          if (res.data.status = 'success') location.reload(true); //this step is require bcz setting this as true forces to reload from server side as there may be reload from cache
+          _context3.next = 11;
+          break;
+        case 7:
+          _context3.prev = 7;
+          _context3.t0 = _context3["catch"](0);
+          console.log(_context3.t0.response);
+          (0, _alert.showAlert)('error', 'Error logging out! Try again.');
+        case 11:
+        case "end":
+          return _context3.stop();
+      }
+    }, _callee3, null, [[0, 7]]);
+  }));
+  return function logout() {
+    return _ref3.apply(this, arguments);
   };
 }();
 },{"axios":"../../node_modules/axios/index.js","./alert":"alert.js"}],"stripe.js":[function(require,module,exports) {
@@ -12328,6 +12360,7 @@ var _updateSettings = require("./updateSettings");
 // DOM ELEMENTS
 var mapBox = document.getElementById('map');
 var loginForm = document.querySelector('.form--login');
+var logOutBtn = document.querySelector('.nav__el--logout');
 var signupForm = document.querySelector('#signupBtn');
 var bookBtn = document.getElementById('book-tour');
 var userDataForm = document.querySelector('.form-user-data');
@@ -12348,6 +12381,7 @@ if (loginForm) {
     (0, _login.signup)(email, password);
   });
 }
+if (logOutBtn) logOutBtn.addEventListener('click', _login.logout);
 if (signupForm) {
   signupForm.addEventListener('click', function (e) {
     e.preventDefault();
